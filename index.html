@@ -14,93 +14,97 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            touch-action: none; /* スマホでの意図しないスクロールを防止 */
+            justify-content: space-between; /* 上下左右の隙間を最適化 */
+            height: 100vh;
+            height: 100dvh; /* スマホ画面にぴったり合わせる */
+            touch-action: none;
+            overflow: hidden;
         }
 
         h1 {
-            font-size: 1.5rem;
-            margin: 10px 0;
-            color: #ddd;
+            font-size: 0.9rem; /* タイトルを小さくして目立たせない */
+            margin: 5px 0 0 0;
+            color: #888;
+            flex-shrink: 0;
         }
 
         #game-container {
             display: flex;
-            flex-direction: row;
-            gap: 20px;
-            align-items: flex-start;
-        }
-
-        /* 画面が小さい時（スマホなど）は縦並びに */
-        @media (max-width: 600px) {
-            #game-container {
-                flex-direction: column;
-                align-items: center;
-                gap: 10px;
-            }
+            flex-direction: row; /* スマホでも常に横並びにして縦スペースを節約 */
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            flex: 1 1 auto;
+            min-height: 0; /* キャンバスの縮小を許可 */
+            width: 100%;
+            max-width: 500px;
+            padding: 5px;
+            box-sizing: border-box;
         }
 
         .canvas-wrapper {
             position: relative;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        canvas {
+        canvas#tetris {
             background-color: #000;
-            border: 4px solid #444;
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.5);
-            /* キャンバスの論理サイズを維持したまま画面サイズに合わせて縮小 */
-            max-width: 100%;
-            height: auto;
-            width: 300px; /* 論理幅 (10マス * 30px) */
+            border: 2px solid #444;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.8);
+            height: 100%; /* 親の高さに合わせて最大限表示 */
+            max-height: 100%;
+            width: auto;
+            aspect-ratio: 1 / 2; /* 縦横比をキープ */
         }
 
         #ui-panel {
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            background: #333;
-            padding: 15px;
-            border-radius: 8px;
-            min-width: 120px;
-            text-align: center;
+            gap: 8px; /* 隙間を小さく */
+            min-width: 50px; /* パネル自体を極力細く */
+            flex-shrink: 0;
         }
 
         .stat-box {
             background: #111;
-            padding: 10px;
+            padding: 5px; /* 余白を最小限に */
             border-radius: 4px;
+            text-align: center;
         }
 
         .stat-label {
-            font-size: 0.8rem;
-            color: #aaa;
-            margin-bottom: 5px;
+            font-size: 0.6rem; /* ラベルを極小に */
+            color: #888;
+            margin-bottom: 2px;
         }
 
         .stat-value {
-            font-size: 1.5rem;
+            font-size: 1rem; /* スコアなどの文字も小さく */
             font-weight: bold;
             color: #4ade80;
         }
 
-        /* スマホ向け操作ボタン */
         #mobile-controls {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-top: 20px;
+            gap: 6px; /* ボタン同士の隙間を詰める */
+            padding: 5px 10px 15px 10px;
             width: 100%;
-            max-width: 300px;
+            max-width: 350px;
+            flex-shrink: 0; /* 操作エリアは絶対に潰さない */
+            box-sizing: border-box;
         }
 
         .control-btn {
             background-color: #444;
             color: white;
             border: none;
-            padding: 15px;
-            font-size: 1.5rem;
+            padding: 15px 0; /* 縦のタップ領域をしっかり確保 */
+            font-size: 1.2rem;
             border-radius: 8px;
             cursor: pointer;
             user-select: none;
@@ -111,21 +115,37 @@
             background-color: #666;
         }
 
-        /* ボタンの配置設定 */
+        #btn-hold { grid-column: 1; grid-row: 1; background-color: #a855f7; font-size: 1rem; font-weight: bold; }
         #btn-left { grid-column: 1; grid-row: 2; }
         #btn-right { grid-column: 3; grid-row: 2; }
         #btn-down { grid-column: 2; grid-row: 2; }
         #btn-rotate { grid-column: 2; grid-row: 1; background-color: #3b82f6; }
         #btn-drop { grid-column: 1 / span 3; grid-row: 3; background-color: #ef4444; padding: 10px;}
 
-        /* PCではボタンを非表示にする（任意ですが、今回は見えたままでもOKにします） */
+        /* PC等、画面が広い場合は元の見やすいサイズに戻す */
         @media (min-width: 601px) {
             #mobile-controls {
                 display: none;
             }
+            h1 {
+                font-size: 1.5rem;
+                margin: 10px 0;
+            }
+            #ui-panel {
+                min-width: 100px;
+                gap: 15px;
+            }
+            .stat-box {
+                padding: 10px;
+            }
+            .stat-label {
+                font-size: 0.8rem;
+            }
+            .stat-value {
+                font-size: 1.5rem;
+            }
         }
 
-        /* ゲームオーバー画面 */
         #game-over-screen {
             position: absolute;
             top: 0;
@@ -137,7 +157,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            border-radius: 8px;
+            border-radius: 4px;
         }
 
         #game-over-screen.active {
@@ -146,16 +166,16 @@
 
         #game-over-screen h2 {
             color: #ef4444;
-            font-size: 2rem;
-            margin: 0 0 20px 0;
+            font-size: 1.5rem;
+            margin: 0 0 15px 0;
         }
 
         #restart-btn {
             background: #4ade80;
             color: #000;
             border: none;
-            padding: 10px 20px;
-            font-size: 1.2rem;
+            padding: 8px 16px;
+            font-size: 1rem;
             font-weight: bold;
             border-radius: 5px;
             cursor: pointer;
@@ -184,16 +204,23 @@
                 <div class="stat-label">レベル</div>
                 <div class="stat-value" id="level">1</div>
             </div>
+            <!-- HOLDブロックを表示するキャンバス -->
+            <div class="stat-box">
+                <div class="stat-label">HOLD</div>
+                <canvas id="hold-piece" width="90" height="90" style="width: 50px; height: 50px; border: none; background: transparent;"></canvas>
+            </div>
             <!-- 次のブロックを表示するキャンバス -->
             <div class="stat-box">
                 <div class="stat-label">NEXT</div>
-                <canvas id="next-piece" width="90" height="90" style="width: 90px; border: none; box-shadow: none; background: transparent;"></canvas>
+                <!-- インラインスタイルで表示サイズのみ縮小 -->
+                <canvas id="next-piece" width="90" height="90" style="width: 50px; height: 50px; border: none; background: transparent;"></canvas>
             </div>
         </div>
     </div>
 
     <!-- スマホ・タブレット用コントローラー -->
     <div id="mobile-controls">
+        <button class="control-btn" id="btn-hold">HOLD</button>
         <button class="control-btn" id="btn-rotate">↻</button>
         <button class="control-btn" id="btn-left">←</button>
         <button class="control-btn" id="btn-down">↓</button>
@@ -207,10 +234,13 @@
         const context = canvas.getContext('2d');
         const nextCanvas = document.getElementById('next-piece');
         const nextContext = nextCanvas.getContext('2d');
+        const holdCanvas = document.getElementById('hold-piece');
+        const holdContext = holdCanvas.getContext('2d');
 
         // キャンバスのサイズを2倍にしてRetinaディスプレイ等でも綺麗に表示（内部論理は300x600）
         context.scale(30, 30); 
         nextContext.scale(30, 30);
+        holdContext.scale(30, 30);
 
         // --- ブロックの定義 ---
         // 0: 空白, 1~7: 各ブロックの色
@@ -247,6 +277,8 @@
         };
 
         let nextPieceMatrix = null;
+        let holdPieceMatrix = null;
+        let canHold = true;
         let dropCounter = 0;
         let dropInterval = 1000; // 初期落下速度（1秒=1000ms）
         let lastTime = 0;
@@ -278,8 +310,21 @@
 
             // 盤面の描画
             drawMatrix(arena, {x: 0, y: 0}, context);
+            
             // 操作中のブロックの描画
             if(player.matrix) {
+                // ゴースト（落下予測地点）の計算と描画
+                const ghostPos = { x: player.pos.x, y: player.pos.y };
+                while (!collide(arena, { matrix: player.matrix, pos: ghostPos })) {
+                    ghostPos.y++;
+                }
+                ghostPos.y--; // 当たる直前の位置に戻す
+
+                context.globalAlpha = 0.25; // ゴーストを半透明に
+                drawMatrix(player.matrix, ghostPos, context);
+                context.globalAlpha = 1.0; // 透明度を元に戻す
+
+                // 実際のブロックを描画
                 drawMatrix(player.matrix, player.pos, context);
             }
         }
@@ -300,6 +345,23 @@
                 if(nextPieceMatrix.length === 2) { offset.x += 0.5; offset.y += 0.5; }
 
                 drawMatrix(nextPieceMatrix, offset, nextContext);
+            }
+        }
+
+        // HOLDブロックを描画
+        function drawHoldPiece() {
+            holdContext.fillStyle = '#333';
+            holdContext.fillRect(0, 0, holdCanvas.width, holdCanvas.height);
+            
+            if (holdPieceMatrix) {
+                const offset = {
+                    x: (3 - holdPieceMatrix[0].length) / 2 + 0.5,
+                    y: (3 - holdPieceMatrix.length) / 2 + 0.5
+                };
+                if(holdPieceMatrix.length === 4) { offset.y -= 0.5; offset.x -= 0.5; }
+                if(holdPieceMatrix.length === 2) { offset.x += 0.5; offset.y += 0.5; }
+
+                drawMatrix(holdPieceMatrix, offset, holdContext);
             }
         }
 
@@ -344,6 +406,7 @@
                     }
                 });
             });
+            canHold = true; // ブロックが固定されたら再度HOLD可能にする
         }
 
         // 回転ロジック
@@ -405,6 +468,34 @@
             if (collide(arena, player)) {
                 gameOver();
             }
+        }
+
+        // ホールド（キープ）機能
+        function playerHold() {
+            if (isGameOver || !canHold) return;
+
+            if (holdPieceMatrix === null) {
+                // 初めてのホールド: 現在のブロックを預けて次を取り出す
+                holdPieceMatrix = player.matrix;
+                playerReset();
+            } else {
+                // 2回目以降: 預けているブロックと現在のブロックを交換
+                const temp = player.matrix;
+                player.matrix = holdPieceMatrix;
+                holdPieceMatrix = temp;
+
+                // 位置を初期位置にリセット
+                player.pos.y = 0;
+                player.pos.x = Math.floor(arena[0].length / 2) - Math.floor(player.matrix[0].length / 2);
+
+                if (collide(arena, player)) {
+                    gameOver();
+                }
+            }
+
+            canHold = false; // 次のブロックが固定されるまで連続HOLD不可
+            dropCounter = 0;
+            drawHoldPiece();
         }
 
         // --- プレイヤーのアクション ---
@@ -483,6 +574,9 @@
             player.score = 0;
             player.level = 1;
             dropInterval = 1000;
+            holdPieceMatrix = null;
+            canHold = true;
+            drawHoldPiece();
             updateScore();
             isGameOver = false;
             document.getElementById('game-over-screen').classList.remove('active');
@@ -527,6 +621,10 @@
                 case 32: // スペース (ハードドロップ)
                     playerHardDrop();
                     break;
+                case 16: // Shiftキー
+                case 67: // Cキー
+                    playerHold();
+                    break;
             }
         });
 
@@ -550,6 +648,7 @@
         bindTouchBtn('btn-down', () => playerDrop());
         bindTouchBtn('btn-rotate', () => playerRotate(1));
         bindTouchBtn('btn-drop', () => playerHardDrop());
+        bindTouchBtn('btn-hold', () => playerHold());
 
         document.getElementById('restart-btn').addEventListener('click', resetGame);
         document.getElementById('restart-btn').addEventListener('touchstart', (e) => {
